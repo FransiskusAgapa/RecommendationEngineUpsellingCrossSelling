@@ -5,11 +5,17 @@ from scipy.sparse import csr_matrix # Sparse matric implementation, saves memory
 from sklearn.neighbors import NearestNeighbors # KNN algorithm for collaborative filtering
 
 # Load datasets and cache data for improved performance
+@st.cache_data(persist=True) # Efficiently cache data to speed up repeated loading
 def load_data(sample_size=500000): #  # Loads only a small/simple subset (first 500,000 rows) for safe load, take this out when cloud deploy
-    orders = pd.read_csv("InstaCartMarketAnalysis/order_products__prior.csv",nrows=sample_size) # Loads Instacart order data
-    products = pd.read_csv("InstaCartMarketAnalysis/products.csv") # Loads Instacart products data 
-    merged_df = orders.merge(products,on="product_id") # Merges orders and product datasets for complete information
-    return merged_df 
+    df = pd.read_pickle('merged_instacart.pkl')
+    return df.sample(n=sample_size) if sample_size else df
+    # ---
+    # orders = pd.read_csv("InstaCartMarketAnalysis/order_products__prior.csv",nrows=sample_size) # Loads Instacart order data
+    # products = pd.read_csv("InstaCartMarketAnalysis/products.csv") # Loads Instacart products data 
+    # merged_df = orders.merge(products,on="product_id") # Merges orders and product datasets for complete information
+    # return merged_df 
+    # ---
+    # return pd.read_pickle('merged_instacart.pkl')  # much faster load
 
 # Create a user-item interaction matrix fro collaborative filtering 
 def create_matrix(df, num_orders=10000, num_products=1000):
@@ -67,7 +73,7 @@ def main():
     if st.button("Recommend"):
         recommendations = recommend_products(model_knn, user_item_matrix, selected_product)
         recommended_products = df[df['product_id'].isin(recommendations)][['product_id', 'product_name']].drop_duplicates()
-        st.success("🔖 Recommended Products:")
+        st.success("🔖 Recommended Similar Products:")
         st.table(recommended_products)
 
 if __name__ == "__main__":
