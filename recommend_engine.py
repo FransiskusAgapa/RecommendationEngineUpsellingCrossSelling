@@ -4,6 +4,10 @@ import numpy as np # Numpy library for numerical computation
 from scipy.sparse import csr_matrix # Sparse matric implementation, saves memory
 from sklearn.neighbors import NearestNeighbors # KNN algorithm for collaborative filtering
 
+# **TODO**
+# - Add CSV Submission 
+# - Printable File Generator
+
 # Load datasets and cache data for improved performance
 @st.cache_data(persist=True) # Efficiently cache data to speed up repeated loading
 def load_data(sample_size=500000): #  # Loads only a small/simple subset (first 500,000 rows) for safe load, take this out when cloud deploy
