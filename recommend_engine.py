@@ -47,28 +47,28 @@ def main():
     st.title("\n🛒 Instacart Recommendation Engine") # Sets title of the streamlit app 
     df = load_data() # Loads datasets for recommendation engine
 
+    matrix, user_item_matrix = create_matrix(df) # Creates interaction matrix needed for collaborative filtering
+    model_knn = fit_model(matrix) # Fits the KNN model on interaction matrix
+
     st.subheader("\nSample Products") # Subtitle for sample product display
     sample_products = df[["product_id","product_name"]].drop_duplicates().sample(10) # Randomly selects samples products to display to users
     st.table(sample_products) # Displays the selected sample products in table format 
 
-    matrix, user_item_matrix = create_matrix(df) # Creates interaction matrix needed for collaborative filtering
-    model_knn = fit_model(matrix) # Fits the KNN model on interaction matrix
+    # Clearly map product IDs to names for easy display
+    available_products = df[['product_id', 'product_name']].drop_duplicates()
+    product_dict = dict(zip(available_products['product_id'], available_products['product_name']))
 
-    # Local test only use available ID's within specified subset
-    available_product_ids = user_item_matrix.index.to_list() # Get available IDs from the redduced datasets
     selected_product = st.selectbox(
-        "Choose a product ID to recommend similar products:",
-        available_product_ids
+        "Select a product to recommend similar items:",
+        available_products['product_id'].tolist(),
+        format_func=lambda pid: f"{pid} - {product_dict.get(pid, 'Unknown Product')}"
     )
-    
-    # NOTE: Use this variable below on production
-    # selected_product = st.number_input("Enter a Product ID to Recommend Similar Products:",min_value=int(df["product_id"].min()),max_value=int(df["product_id"].max()),value=int(sample_products.iloc[0]["product_id"])) # User input for selecting product ID to get recommendation
 
-    if st.button("Recommend"): # Button to trigger recommendation
-        recommendations = recommend_products(model_knn,user_item_matrix,selected_product) # Generates recommended products based on user selection
-        recommended_products = df[df["product_id"].isin(recommendations)][["product_id","product_name"]].drop_duplicates() # Filters recommended products for displaying product names
-        st.success("\n🔖 Recommended Products:") # Filters recommended products for displaying products names
-        st.table(recommended_products) # Shows recommended product in table format
+    if st.button("Recommend"):
+        recommendations = recommend_products(model_knn, user_item_matrix, selected_product)
+        recommended_products = df[df['product_id'].isin(recommendations)][['product_id', 'product_name']].drop_duplicates()
+        st.success("🔖 Recommended Products:")
+        st.table(recommended_products)
 
 if __name__ == "__main__":
     main() # Execute main function
