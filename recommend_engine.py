@@ -111,9 +111,11 @@ def main():
             sample_products = df[['product_id', 'product_name']].drop_duplicates().sample(10)
             st.table(sample_products)
 
+            # Get unique available products clearly from your sampled dataset
             available_products = df[['product_id', 'product_name']].drop_duplicates()
             product_dict = dict(zip(available_products['product_id'], available_products['product_name']))
 
+            # Clearly display product selection using product ID and name from your sampled data
             selected_product = st.selectbox(
                 "Select a product to recommend similar items:",
                 available_products['product_id'].tolist(),
@@ -121,16 +123,17 @@ def main():
             )
 
             if st.button("Recommend"):
-                recommendations = recommend_products(model_knn, user_item_matrix, selected_product)
-                recommended_products = df[df['product_id'].isin(recommendations)][['product_id', 'product_name']].drop_duplicates()
-                st.success("🔖 Recommended Products:")
-                st.table(recommended_products)
+                # Before making recommendations, ensure the product ID is clearly present
+                if selected_product not in user_item_matrix.index:
+                    st.error(f"⚠️ Error: The product ID {selected_product} doesn't exist in the current data. Please select another product.")
+                else:
+                    recommendations = recommend_products(model_knn, user_item_matrix, selected_product)
+                    recommended_products = df[df['product_id'].isin(recommendations)][['product_id', 'product_name']].drop_duplicates()
+                    st.success("🔖 Recommended Products:")
+                    st.table(recommended_products)
 
-                st.session_state.recommendations = recommended_products
-
-            if "recommendations" in st.session_state:
-                if st.button("📄 Generate PDF Report"):
-                    generate_pdf_report(st.session_state.recommendations)
+                    # Store recommendations clearly for later PDF generation
+                    st.session_state.recommendations = recommended_products
 
     else:
         st.info("ℹ️ Please upload both CSV files to continue.")
