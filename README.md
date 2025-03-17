@@ -4,20 +4,11 @@
 ### Instacart Recommendation Engine
 
 > # Dataset Instructions - Due to size constraints, download the dataset separately from:
-- [Instacart Market Basket Analysis - Kaggle](https://www.kaggle.com/c/instacart-market-basket-analysis/data)
 
-- **Files you need to download:
-    - `order_products__prior.csv`
-    - `products.csv`
-
-- Install dependencies:
-```bash
-    pip install streamlit pandas numpy scipy scikit-learn
-    
-> How it works
-- You pick an item (for example, Borlotti Beans).
-- Behind the scenes, the recommendation engine looks at what other shoppers bought alongside Borlotti Beans and finds products frequently chosen together by many customers.
-- You instantly see recommendations like similar beans, vegetables, or spices that people typically buy when they buy beans.
+> Speed Improvement
+- Consider using Scikit-learn's Approximate Nearest Neighbors (if speed critical)
+- If real-time speed becomes crucial, you can also look into approximate methods like Annoy, Faiss, or ScaNN.
+    - ⚠️ Requires switching from KNN to ANN libraries, but can give 10-100x speedups.
 
 > Why matters:
 - Saves Time: Quickly discover related products without searching through the entire store.
